@@ -18,6 +18,7 @@ namespace api.Controllers
             _context = context;
         }
 
+        //get all of the stocks
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -26,6 +27,7 @@ namespace api.Controllers
             return Ok(stocks); 
         }
 
+        //get stock by id
         [HttpGet("{id}")]
         public IActionResult GetById([FromRoute] int id)
         {
