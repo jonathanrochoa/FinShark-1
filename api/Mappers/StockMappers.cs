@@ -21,6 +21,7 @@ namespace api.Mappers
                 Industry = stockModel.Industry,
                 MarketCap = stockModel.MarketCap
             };
+            //added comment
         }
     }
 }
