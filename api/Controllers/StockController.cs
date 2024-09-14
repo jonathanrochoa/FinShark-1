@@ -54,5 +54,30 @@ namespace api.Controllers
             return CreatedAtAction(nameof(GetById), new {id = stockModel.Id}, stockModel.ToStockDto()); //returns 200OK and values for the stockModel Id created
         }
 
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto) //from route is the box where we enter data appended to the url
+        {
+            var stockModel = _context.Stock.FirstOrDefault(x => x.Id == id); //getting the first entry in the model where the id matches
+
+            if(stockModel == null)
+            {
+                return NotFound();
+            }
+
+            //directly updating the table using our UpdateStockRequestDto copy that has values passed-in from the body in the endpoint
+            stockModel.Symbol = updateDto.Symbol;
+            stockModel.CompanyName = updateDto.CompanyName;
+            stockModel.Purchase = updateDto.Purchase;
+            stockModel.LastDividend = updateDto.LastDividend;
+            stockModel.Industry = updateDto.Industry;
+            stockModel.MarketCap = updateDto.MarketCap;
+
+            _context.SaveChanges();
+
+            return Ok(stockModel.ToStockDto());
+
+        }
+
     }
 }
