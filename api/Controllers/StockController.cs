@@ -40,7 +40,7 @@ namespace api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var stock = await _context.Stock.FindAsync(id); //find selected over first or default
+            var stock = await _stockRepo.GetByIdAsync(id); //find selected over first or default
 
             if(stock == null)
             {
@@ -55,8 +55,8 @@ namespace api.Controllers
         {
             var stockModel = stockDto.ToStockFromCreateDto(); //which then creates a var of the passed-in CreateStockRequestDto into the mapper
                                                                 //which passes in the Dto into the model, mapper then returns a copy of the model
-            await _context.Stock.AddAsync(stockModel); //add to the model context
-            await _context.SaveChangesAsync(); 
+            await _stockRepo.CreateAsync(stockModel);
+
             return CreatedAtAction(nameof(GetById), new {id = stockModel.Id}, stockModel.ToStockDto()); //returns 200OK and values for the stockModel Id created
         }
 
@@ -64,22 +64,12 @@ namespace api.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto) //from route is the box where we enter data appended to the url
         {
-            var stockModel = await _context.Stock.FirstOrDefaultAsync(x => x.Id == id); //getting the first entry in the model where the id matches
+            var stockModel = await _stockRepo.UpdateAsync(id, updateDto); //getting the first entry in the model where the id matches
 
             if(stockModel == null)
             {
                 return NotFound();
             }
-
-            //directly updating the table using our UpdateStockRequestDto copy that has values passed-in from the body in the endpoint
-            stockModel.Symbol = updateDto.Symbol;
-            stockModel.CompanyName = updateDto.CompanyName;
-            stockModel.Purchase = updateDto.Purchase;
-            stockModel.LastDividend = updateDto.LastDividend;
-            stockModel.Industry = updateDto.Industry;
-            stockModel.MarketCap = updateDto.MarketCap;
-
-            await _context.SaveChangesAsync();
 
             return Ok(stockModel.ToStockDto());
 
@@ -89,16 +79,12 @@ namespace api.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var stockModel = await _context.Stock.FirstOrDefaultAsync(x => x.Id == id);
+            var stockModel = await _stockRepo.DeleteAsync(id);
 
             if(stockModel == null)
             {
                 return NotFound();
             }
-
-            _context.Stock.Remove(stockModel); //remove not an async function so we do not add await
-
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
