@@ -29,6 +29,9 @@ namespace api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll() //endpoint carries the same name as base bc we did not modify yet
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stocks = await _stockRepo.GetAllAsync();
 
             var stocksDto = stocks.Select(s => s.ToStockDto()); //for every stock in the dbset list, select the mapper version we created (ToStockDto), 
@@ -37,9 +40,12 @@ namespace api.Controllers
         }
 
         //get stock by id
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stock = await _stockRepo.GetByIdAsync(id); //find selected over first or default
 
             if(stock == null)
@@ -53,6 +59,9 @@ namespace api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stockDto) //takes in the values used in the Dto CreateStockRequestDto
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stockModel = stockDto.ToStockFromCreateDto(); //which then creates a var of the passed-in CreateStockRequestDto into the mapper
                                                                 //which passes in the Dto into the model, mapper then returns a copy of the model
             await _stockRepo.CreateAsync(stockModel);
@@ -61,9 +70,12 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto) //from route is the box where we enter data appended to the url
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stockModel = await _stockRepo.UpdateAsync(id, updateDto); //getting the first entry in the model where the id matches
 
             if(stockModel == null)
@@ -76,9 +88,12 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+                
             var stockModel = await _stockRepo.DeleteAsync(id);
 
             if(stockModel == null)
