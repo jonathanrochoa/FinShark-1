@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
 using api.Dtos.Stock;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Migrations;
@@ -27,12 +28,12 @@ namespace api.Controllers
 
         //get all of the stocks
         [HttpGet]
-        public async Task<IActionResult> GetAll() //endpoint carries the same name as base bc we did not modify yet
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query) //endpoint carries the same name as base bc we did not modify yet
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var stocks = await _stockRepo.GetAllAsync();
+            var stocks = await _stockRepo.GetAllAsync(query);
 
             var stocksDto = stocks.Select(s => s.ToStockDto()); //for every stock in the dbset list, select the mapper version we created (ToStockDto), 
                                             //which returns the mappers version of the called StockDto
