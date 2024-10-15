@@ -9,6 +9,7 @@ using api.Interfaces;
 using api.Mappers;
 using api.Migrations;
 using api.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,7 @@ namespace api.Controllers
 
         //get all of the stocks
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query) //endpoint carries the same name as base bc we did not modify yet
         {
             if(!ModelState.IsValid)
