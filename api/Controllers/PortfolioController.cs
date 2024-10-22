@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using api.Extensions;
 using api.Interfaces;
@@ -35,5 +36,46 @@ namespace api.Controllers
             var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
             return Ok(userPortfolio);
         }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddPortfolio(string symbol)
+        {
+            var username = User.GetUserName();
+
+            var appUser = await _userManager.FindByNameAsync(username);
+
+            var stock = await _stockRepo.GetBySymboAsync(symbol);
+
+            if(stock == null)
+            {
+                return BadRequest("Stock not found");
+            }
+
+            var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
+
+            if(userPortfolio.Any(p => p.Symbol.ToLower() == symbol.ToLower()))
+            {
+                return BadRequest("Cannot add same stock to portfolio");
+            }
+
+            var portfolioModel = new Portfolio
+            {
+                StockId = stock.Id,
+                AppUserId = appUser.Id
+            };
+
+            await _portfolioRepo.CreateAsync(portfolioModel);
+
+            if(portfolioModel == null)
+            {
+                return StatusCode(500, "Could not crate portfolio");
+            }
+            else
+            {
+                return Created();
+            }
+        }
+
     }
 }
