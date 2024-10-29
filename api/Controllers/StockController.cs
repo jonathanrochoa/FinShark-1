@@ -36,7 +36,7 @@ namespace api.Controllers
 
             var stocks = await _stockRepo.GetAllAsync(query);
 
-            var stocksDto = stocks.Select(s => s.ToStockDto()); //for every stock in the dbset list, select the mapper version we created (ToStockDto), 
+            var stocksDto = stocks.Select(s => s.ToStockDto()).ToList(); //for every stock in the dbset list, select the mapper version we created (ToStockDto), 
                                             //which returns the mappers version of the called StockDto
             return Ok(stocksDto);
         }
